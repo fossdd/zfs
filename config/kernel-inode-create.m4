@@ -54,6 +54,17 @@ AC_DEFUN([ZFS_AC_KERNEL_SRC_CREATE], [
 ])
 
 AC_DEFUN([ZFS_AC_KERNEL_CREATE], [
+	dnl #
+	dnl # 7.3 dropped the flag arg entirely, so the mnt_idmap test below
+	dnl # (which still expects it) no longer matches. If the no-flag
+	dnl # variant is what's present (see kernel-inode-create-no-flag.m4),
+	dnl # struct mnt_idmap* is still the arg type in use - just without
+	dnl # a trailing flag - so HAVE_IOPS_CREATE_IDMAP is still correct.
+	dnl #
+	ZFS_LINUX_TEST_RESULT([iops_create_no_flag], [
+		AC_DEFINE(HAVE_IOPS_CREATE_IDMAP, 1,
+		   [iops->create() takes struct mnt_idmap*])
+	],[
 	AC_MSG_CHECKING([whether iops->create() takes struct mnt_idmap*])
 	ZFS_LINUX_TEST_RESULT([create_mnt_idmap], [
 		AC_MSG_RESULT(yes)
@@ -77,5 +88,6 @@ AC_DEFUN([ZFS_AC_KERNEL_CREATE], [
 				ZFS_LINUX_TEST_ERROR([iops->create()])
 			])
 		])
+	])
 	])
 ])
